@@ -3,12 +3,12 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 
-# Configurare cheie secretă și algoritm JWT
+
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Simulare bază de date cu utilizatori
+
 fake_users_db = {
     "admin": {"username": "admin", "password": "1234", "role": "admin"},
     "user": {"username": "user", "password": "1234", "role": "user"}
@@ -23,7 +23,6 @@ def read_root():
     return {"message": "API is working!"}
 
 
-# Funcție pentru generare token JWT
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
@@ -41,7 +40,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# Funcție pentru validare token JWT
+
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
