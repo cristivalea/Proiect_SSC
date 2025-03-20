@@ -14,15 +14,18 @@ fake_users_db = {
     "user": {"username": "user", "password": "1234", "role": "user"}
 }
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token") # endpoint unde se trimite nume si parola pentru tpken
+#creare aplicatie FastAPI
 app = FastAPI()
 
 
+#definirea unui endpoint principal
 @app.get("/")
 def read_root():
     return {"message": "API is working!"}
 
 
+#creare token
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
@@ -30,6 +33,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
+#endpoint pentru autentificare
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = fake_users_db.get(form_data.username)
@@ -41,6 +45,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 
+#verifica si decodeaza token JWT
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -53,6 +58,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
+#endpoint pentru lista de studenti
 @app.get("/students")
 def get_students(user: dict = Depends(get_current_user)):
     if user["role"] != "admin":
@@ -66,6 +72,7 @@ def get_students(user: dict = Depends(get_current_user)):
     return {"students": students}
 
 
+#endpoint pentru inregistrare
 @app.post("/register")
 def register(username: str, password: str, role: str = "user"):
     if username in fake_users_db:
@@ -74,6 +81,7 @@ def register(username: str, password: str, role: str = "user"):
     return {"message": "User registered successfully"}
 
 
+#endpoint pentru profilul utilizatorului autentificat
 @app.get("/profile")
 def get_profile(user: dict = Depends(get_current_user)):
     return {"username": user["username"], "role": user["role"]}
