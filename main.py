@@ -1,4 +1,4 @@
-# main.py
+
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -11,8 +11,8 @@ import schemas
 app = FastAPI()
 
 
-# ======= Register endpoint =======
-@app.post("/register", response_model=schemas.UserCreate)
+
+@app.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
@@ -26,7 +26,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-# ======= Token endpoint =======
+
 @app.post("/token", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
@@ -40,11 +40,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# ======= Protected endpoint (optional) =======
+
 @app.get("/protected")
 def protected_route(current_user: schemas.TokenData = Depends(auth.get_current_user)):
     return {"message": f"Hello {current_user.username}, you have access!"}
 
 @app.get("/")
 def read_root():
-    return {"message": "API is running! 🚀"}
+    return {"message": "API is running! "}
