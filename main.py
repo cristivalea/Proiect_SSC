@@ -51,7 +51,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 # def protected_route(token: str = Depends(oauth2_scheme)):
 #     return {"your_token": token}
 
-# ======= Protected route example =======
 @app.get("/me", response_model=schemas.UserOut)
 def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
     return current_user
