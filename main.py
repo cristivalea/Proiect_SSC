@@ -11,7 +11,6 @@ import schemas
 app = FastAPI()
 
 
-
 @app.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
