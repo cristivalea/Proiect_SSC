@@ -9,7 +9,7 @@ import utils
 import schemas
 
 app = FastAPI()
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -40,9 +40,21 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 
 
 
-@app.get("/protected")
-def protected_route(current_user: schemas.TokenData = Depends(auth.get_current_user)):
-    return {"message": f"Hello {current_user.username}, you have access!"}
+# @app.get("/protected")
+# def protected_route(current_user: schemas.TokenData = Depends(auth.get_current_user)):
+#     return {"message": f"Hello {current_user.username}, you have access!"}
+
+
+
+#
+# @app.get("/protected")
+# def protected_route(token: str = Depends(oauth2_scheme)):
+#     return {"your_token": token}
+
+# ======= Protected route example =======
+@app.get("/me", response_model=schemas.UserOut)
+def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
+    return current_user
 
 @app.get("/")
 def read_root():
